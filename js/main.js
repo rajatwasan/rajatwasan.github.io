@@ -1251,13 +1251,14 @@ $(document).ready(function () {
         if (error) {
             $.ajax({
                 type: "POST",
-                url: "contact.php",
+                url: "https://script.google.com/macros/s/AKfycbxKvF4P9NoURh4ehALNwKp9WzztpD9JWjvgcrQFwfJr8NeAgZ8/exec",
                 data: $("#contactusform").serialize(),
                 success: function (result) {
                     $('input[type=text],textarea').each(function () {
                         $(this).val('');
                     })
                     $("#success").html(result);
+                    $("#success").html("The message has been sent!");
                     $("#success").fadeIn("slow");
                     $('#success').delay(4000).fadeOut("slow");
                 }
@@ -1289,86 +1290,7 @@ $(document).ready(function () {
         return error;
     }    
 
-    $("#notifyme-button").click(function () {
-        var error = validationnotifymeForm();
-        if (error) {
-            $.ajax({
-                type: "POST",
-                url: "notifyme.php",
-                data: $("#notifymeform").serialize(),
-                success: function (result) {
-                    $('input[type=text],textarea').each(function () {
-                        $(this).val('');
-                    })
-
-                    $("#success").html(result);
-                    $("#success").fadeIn("slow");
-                    $('#success').delay(4000).fadeOut("slow");
-                }
-            });
-        }
-    });
-    function validationnotifymeForm() {
-        var error = true;
-        $('#notifymeform input[type=text]').each(function (index) {
-
-            if (index == 0) {
-                if (!(/(.+)@(.+){2,}\.(.+){2,}/.test($(this).val()))) {
-                    $("#notifymeform").find("input:eq(" + index + ")").css({ "border": "1px solid red" });
-                    error = false;
-                } else {
-                    $("#notifymeform").find("input:eq(" + index + ")").css({ "border": "1px solid #dfdfdf" });
-                }
-            }
-            
-        });
-        return error;
-    }       
-
-    $("#success-free30daytrial").hide();
-    $("#free30daytrial-button").click(function () {
-        var error = validationfree30daytrialForm();
-        if (error) {
-            $.ajax({
-                type: "POST",
-                url: "free30daytrial.php",
-                data: $("#free30daytrialform").serialize(),
-                success: function (result) {
-                    $('input[type=text],textarea').each(function () {
-                        $(this).val('');
-                    })
-                    $("#success-free30daytrial").html(result);
-                    $("#success-free30daytrial").fadeIn("slow");
-                    $('#success-free30daytrial').delay(4000).fadeOut("slow");
-                }
-            });
-        }
-    });
-    function validationfree30daytrialForm() {
-        var error = true;
-        $('#free30daytrialform input[type=text]').each(function (index) {
-
-            if (index == 1) {
-                if (!(/(.+)@(.+){2,}\.(.+){2,}/.test($(this).val()))) {
-                    $("#free30daytrialform").find("input:eq(" + index + ")").css({ "border": "1px solid red" });
-                    error = false;
-                } else {
-                    $("#free30daytrialform").find("input:eq(" + index + ")").css({ "border": "1px solid #dfdfdf" });
-                }
-            }
-            else if (index == 0) {
-                if ($(this).val() == null || $(this).val() == "") {
-                    $("#free30daytrialform").find("input:eq(" + index + ")").css({ "border": "1px solid red" });
-                    error = false;
-                }
-                else {
-                    $("#free30daytrialform").find("input:eq(" + index + ")").css({ "border": "1px solid #dfdfdf" });
-                }
-            }
-        });
-        return error;
-    }     
-
+           
 
    $("#event-button").click(function () {
         var error = validationeventForm();
