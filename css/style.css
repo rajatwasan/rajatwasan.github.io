@@ -123,6 +123,7 @@ h1.page-title { margin:95px auto 0; width: 100%; }
 .text-small { font-size:11px !important; line-height:15px !important;}
 .text-med{ font-size:14px !important; line-height:26px !important;}
 .text-large { font-size: 15px !important; text-transform: uppercase; line-height: 24px !important; letter-spacing: 2px !important;}
+.text-large-lower { font-size: 15px !important; line-height: 24px !important; letter-spacing: 2px !important;}
 .text-extra-large { font-size: 16px !important; line-height: 28px !important; font-weight: 100; }
 .text-extra-large strong { letter-spacing: 3px}
 .text-extra-large-normal { font-weight: normal !important;}
