@@ -1,27 +1,60 @@
 <!doctype html>
 <title>Site Maintenance</title>
 <style>
-  body { text-align: center; padding: 150px; }
-  h1 { font-size: 50px; }
-  body { font: 20px Helvetica, sans-serif; color: #333; }
-  article { display: block; text-align: left; width: 650px; margin: 0 auto; }
-  a { color: #dc8100; text-decoration: none; }
-  a:hover { color: #333; text-decoration: none; }
+  body {
+    text-align: center;
+    padding: 150px;
+  }
+
+  h1 {
+    font-size: 50px;
+  }
+
+  body {
+    font: 20px Helvetica, sans-serif;
+    color: #333;
+  }
+
+  article {
+    display: block;
+    text-align: left;
+    width: 650px;
+    margin: 0 auto;
+  }
+
+  a {
+    color: #dc8100;
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: #333;
+    text-decoration: none;
+  }
 </style>
 
 <article>
-    <h1>I&rsquo;ll be back soon!</h1>
-    <div>
-        <p>Sorry for the inconvenience but I&rsquo;am performing some maintenance at the moment. If you need to you can always <a href="https://linkedin.com/in/wasanrajat">contact me</a>, otherwise I&rsquo;ll be back online shortly!</p>
-        <p>&mdash; Rajat Wasan</p>
-    </div>
+  <h1>I&rsquo;ll be back soon!</h1>
+  <div>
+    <p>Sorry for the inconvenience but I&rsquo;am performing some maintenance at the moment. If you need to you can
+      always <a href="https://linkedin.com/in/wasanrajat">contact me</a>, otherwise I&rsquo;ll be back online shortly!
+    </p>
+    <p>&mdash; Rajat Wasan</p>
+  </div>
 </article>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-EB58VMQH78"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
+  function gtag() { dataLayer.push(arguments); }
   gtag('js', new Date());
 
   gtag('config', 'G-EB58VMQH78');
+</script>
+<script type="text/javascript">
+  (function (C, A, L) { let p = function (a, ar) { a.q.push(ar); }; let d = C.document; C.Cal = C.Cal || function () { let cal = C.Cal; let ar = arguments; if (!cal.loaded) { cal.ns = {}; cal.q = cal.q || []; d.head.appendChild(d.createElement("script")).src = A; cal.loaded = true; } if (ar[0] === L) { const api = function () { p(api, arguments); }; const namespace = ar[1]; api.q = api.q || []; if (typeof namespace === "string") { cal.ns[namespace] = cal.ns[namespace] || api; p(cal.ns[namespace], ar); p(cal, ["initNamespace", namespace]); } else p(cal, ar); return; } p(cal, ar); }; })(window, "https://app.cal.com/embed/embed.js", "init");
+  Cal("init", "intro", { origin: "https://cal.com" });
+
+  Cal.ns.intro("floatingButton", { "calLink": "rajatwasan/intro", "config": { "layout": "week_view" }, "buttonText": "Book a consultation", "buttonColor": "#0a192f" });
+  Cal.ns.intro("ui", { "styles": { "branding": { "brandColor": "#0a192f" } }, "hideEventTypeDetails": false, "layout": "week_view" });
 </script>
