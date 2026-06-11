@@ -1,3 +1,0 @@
-# rajatwasan.github.io
-
-Portfolio 
