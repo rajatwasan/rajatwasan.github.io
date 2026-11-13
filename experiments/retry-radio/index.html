@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#171b1a">
+<title>Retry Radio | Listen to a retry storm</title>
+<meta name="description" content="Hear how 64 clients recover from the same outage with fixed retries, exponential backoff and jitter. A deterministic systems experiment.">
+<style>:root{--ink:#ecede5;--muted:#b1b8ac;--faint:#899485;--edge:#41493f;--panel:#242924;--black:#111810;--green:#b8ea98;--orange:#ff956a;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:#171b19;color:var(--ink);font-family:Inter,"Helvetica Neue",Arial,sans-serif;font-size:15px}
+main{max-width:1196px;margin:auto;padding:28px clamp(16px,4vw,56px) 24px}
+header,.intro,.panel-head,.scope-head,.transport,.result-head,footer,.legend{display:flex;align-items:center}
+header{gap:11px;padding-bottom:20px;border-bottom:1px solid var(--edge);letter-spacing:.01em}
+.mark{width:34px;height:34px;background:var(--green);display:flex;align-items:center;justify-content:center;gap:2px;border-radius:9px}
+.mark i{width:3px;height:8px;background:#253323;border-radius:2px}.mark i:nth-child(2),.mark i:nth-child(4){height:17px}.mark i:nth-child(3){height:23px}
+.sub,.hint,footer,.controls p{color:var(--muted)}.source{margin-left:auto;text-decoration:none;color:var(--ink);font-size:14px}.source:hover{text-decoration:underline}
+.intro{padding:36px 0 30px;justify-content:space-between;gap:15px}.intro h1{font-size:clamp(52px,7vw,90px);letter-spacing:-.075em;line-height:.97;margin:0;font-weight:700}.intro h1 span{color:var(--orange)}
+.intro p{margin:12px 0 0;font-size:clamp(16px,2vw,21px);color:#c5cec0;letter-spacing:-.025em}
+.air,.fine,.scope-head>span,.legend,.controls label,.fields input,footer>span:last-child,td:not(:first-child){font-family:"IBM Plex Mono","SFMono-Regular",Consolas,monospace;font-variant-numeric:tabular-nums}
+.air{font-size:12px;display:flex;align-items:center;gap:8px;color:var(--green);white-space:nowrap}.air b,.indicator,.dot{display:inline-block;border-radius:100%;width:8px;height:8px;background:var(--green)}.air b{box-shadow:0 0 0 4px #2b392b}
+.deck{display:grid;grid-template-columns:minmax(0,1fr) 276px;border:1px solid var(--edge);border-radius:18px;background:var(--panel);overflow:hidden}
+.monitor,.controls{min-width:0;padding:20px}.controls{border-left:1px solid var(--edge);background:#2a2f29}
+.panel-head{justify-content:space-between;font-size:14px;font-weight:630;letter-spacing:.01em;margin-bottom:16px}.indicator{background:var(--orange);margin-right:5px}.fine{color:var(--muted);font-size:12px;font-weight:400}
+.scope{border:1px solid #4c5948;background:var(--black);border-radius:10px;padding:15px 13px 12px}.scope-head{justify-content:space-between;padding:0 3px 5px}.scope-head h2{margin:0;font-size:22px;letter-spacing:-.04em}.scope-head>span{font-size:13px;color:var(--green)}
+canvas{height:216px;width:100%;display:block}.legend{gap:16px;font-size:11px;color:#c2cbbc;padding:3px 3px 0}.dot{width:7px;height:7px;margin-right:5px}.fail{background:var(--orange)}.ok{background:var(--green)}.axis{margin-left:auto;color:#a4b29b}
+.transport{gap:16px;margin-top:17px}.transport input{min-width:20px;flex:1;accent-color:var(--green);cursor:pointer}
+button,select,input{font:inherit}button,select{cursor:pointer}button{border:1px solid #65705f;border-radius:7px;background:transparent;color:var(--ink);padding:8px 12px}button:hover{background:#3a4237}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+.play{border-color:var(--green);background:var(--green);color:#192116;font-weight:700;min-width:109px}.play:hover{background:#c8f6ac}.audio{font-size:12px;padding:7px 9px}
+.controls label{font-size:11px;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.065em;color:#c6cebf}
+.controls select,.fields input{width:100%;border:1px solid #53604f;background:#20261f;border-radius:6px;height:35px;color:var(--ink);padding:4px 8px}
+.controls p{font-size:12px;line-height:1.45;min-height:34px;margin:8px 0 15px}.fields{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:16px}
+.policies{display:grid;gap:4px}.policies button{text-align:left;width:100%;padding:6px 9px;font-size:13px;display:flex;align-items:center;gap:8px;border-color:transparent}.policies button:before{content:"";border:1px solid #929c8c;width:9px;height:9px;border-radius:50%}.policies button[aria-pressed=true]{background:#374031;border-color:#627155;color:var(--green)}.policies button[aria-pressed=true]:before{background:var(--green);border-color:var(--green)}
+.results{margin-top:29px}.result-head{justify-content:space-between;gap:12px}.result-head h2{margin:0;font-size:clamp(21px,3vw,30px);letter-spacing:-.045em}.result-head button{font-size:12px;white-space:nowrap}.hint{font-size:13px;line-height:1.45;margin:7px 0 14px}
+.table-wrap{overflow:auto}table{border-collapse:collapse;width:100%;font-size:14px}th,td{text-align:right;border-bottom:1px solid var(--edge);padding:11px 6px}th{font-weight:normal;font-size:12px;color:var(--muted);background:#20251f}th:first-child,td:first-child{text-align:left;padding-left:12px}th:last-child,td:last-child{padding-right:12px}tr.active td:first-child{color:var(--green)}td{font-variant-numeric:tabular-nums}
+footer{justify-content:space-between;gap:10px;margin-top:18px;font-size:12px;line-height:1.5}footer>span:last-child{white-space:nowrap}.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+@media(max-width:820px){.deck{grid-template-columns:minmax(0,1fr) 222px}.monitor,.controls{padding:13px}.transport{gap:8px}.legend{gap:10px}}
+@media(max-width:650px){main{padding-top:16px}.intro{padding:28px 0 22px}.air{font-size:10px;align-self:flex-start;margin-top:8px}.deck{display:flex;flex-direction:column}.controls{border-left:0;border-top:1px solid var(--edge)}.policies{grid-template-columns:repeat(3,minmax(0,1fr))}.policies button{font-size:11px;justify-content:center;padding:9px 2px;gap:4px}.controls p{min-height:0;margin-bottom:12px}canvas{height:190px}.result-head{align-items:flex-start}footer>span:last-child{display:none}.axis{font-size:10px}.sub{font-size:12px}.source{font-size:12px}th,td{padding:9px 4px}td{font-size:12px}.hint{font-size:12px}.result-head button{padding:7px 8px;font-size:11px}.transport input{width:100%}}
+@media(max-width:370px){.sub,.air{display:none}.legend{font-size:10px}}
+</style>
+</head>
+<body>
+<main>
+<header><span class="mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><span>Rajat Wasan <span class="sub">/ Systems experiments</span></span><a class="source" href="https://github.com/rajatwasan/rajatwasan.github.io/tree/retry-radio/experiments/retry-radio">Source code</a></header>
+<section class="intro"><div><h1>Retry Radio<span>.</span></h1><p>Hear what happens when clients retry together.</p></div><div class="air"><b></b><span id="signal">Ready to play</span></div></section>
+<div class="deck">
+<section class="monitor" aria-label="Retry trace">
+<div class="panel-head"><div><span class="indicator"></span> Request raster</div><span class="fine" id="client-label">64 clients</span></div>
+<div class="scope"><div class="scope-head"><h2 id="trace-title">Fixed interval</h2><span id="elapsed">00.0 s</span></div>
+<canvas id="raster" role="img" aria-label="Request trace. Each row is a client. Orange marks failed requests and green marks accepted requests."></canvas>
+<div class="legend"><span><i class="dot fail"></i>Rejected</span><span><i class="dot ok"></i>Accepted</span><span class="axis">Time in seconds</span></div></div>
+<div class="transport"><button type="button" id="play" class="play">Play trace</button><label class="sr" for="scrub">Playback position</label><input id="scrub" type="range" min="0" max="100" step="0.1" value="0"><button type="button" id="sound" class="audio" aria-pressed="true">Sound on</button></div>
+</section>
+<aside class="controls" aria-label="Experiment controls">
+<div class="panel-head">Experiment controls</div>
+<label for="incident">Incident</label><select id="incident"><option value="restart">Cold restart</option><option value="brownout">Brownout</option><option value="rolling">Rolling recovery</option></select>
+<p id="description"></p>
+<div class="fields"><div><label for="clients">Clients</label><select id="clients"><option>32</option><option selected>64</option><option>128</option></select></div><div><label for="seed">Replay seed</label><input id="seed" type="number" min="0" max="4294967295" step="1" value="42"></div></div>
+<label id="policy-label">Retry policy</label><div id="policies" class="policies" role="group" aria-labelledby="policy-label"></div>
+</aside></div>
+<section class="results"><div class="result-head"><h2>Same outage, three outcomes.</h2><button id="copy" type="button">Copy replay link</button></div><p class="hint">Peak counts retries in a 100 ms window. The shared first wave is excluded.</p>
+<div class="table-wrap"><table><thead><tr><th>Policy</th><th>Total retries</th><th>Peak retries</th><th>Last success</th></tr></thead><tbody id="scores"></tbody></table></div>
+</section>
+<footer><span>Click a policy to compare. Crackles are rejections. Tones are successes.</span><span>100 ms / tick</span></footer>
+<p id="status" class="sr" role="status"></p>
+</main><script>"use strict";
+// One tick represents 100 ms. Each client has one outstanding operation.
+const TICK_MS = 100;
+const POLICIES = {
+  fixed: "Fixed interval",
+  exponential: "Exponential",
+  jitter: "Full jitter"
+};
+const INCIDENTS = {
+  restart: { label: "Cold restart", description: "Offline for 2 seconds, then 6 requests per tick." },
+  brownout: { label: "Brownout", description: "1 request per tick for 5 seconds, then 6 per tick." },
+  rolling: { label: "Rolling recovery", description: "Offline for 1 second, then capacity rises from 1 to 6 requests per tick." }
+};
+const DEFAULTS = { incident: "restart", clients: 64, seed: 42 };
+
+// SplitMix32 gives each client its own reproducible stream of retry delays.
+function randomStream(seed) {
+  let state = seed >>> 0;
+  return function next() {
+    state = (state + 0x9e3779b9) >>> 0;
+    let value = state ^ (state >>> 16);
+    value = Math.imul(value, 0x21f0aaad);
+    value ^= value >>> 15;
+    value = Math.imul(value, 0x735a2d97);
+    return ((value ^ (value >>> 15)) >>> 0) / 4294967296;
+  };
+}
+
+function capacityAt(tick, incident) {
+  if (incident === "restart") return tick < 20 ? 0 : 6;
+  if (incident === "brownout") return tick < 50 ? 1 : 6;
+  if (incident === "rolling") return tick < 10 ? 0 : Math.min(6, 1 + Math.floor((tick - 10) / 8));
+  throw new RangeError("Unknown incident");
+}
+
+function retryDelay(policy, failures, random) {
+  if (policy === "fixed") return 8;
+  const ceiling = Math.min(32, 8 * 2 ** Math.min(failures - 1, 2));
+  // A failed request can only be rescheduled into a future tick.
+  if (policy === "jitter") return 1 + Math.floor(random() * ceiling);
+  return ceiling;
+}
+
+function simulate({ incident = "restart", clients = 64, seed = 42, policy = "jitter" } = {}) {
+  if (!Object.hasOwn(INCIDENTS, incident) || !Object.hasOwn(POLICIES, policy)) throw new RangeError("Unknown scenario or policy");
+  if (!Number.isInteger(clients) || clients < 1 || clients > 128) throw new RangeError("Clients must be 1 to 128");
+  if (!Number.isInteger(seed) || seed < 0 || seed > 0xffffffff) throw new RangeError("Seed must be an unsigned 32-bit integer");
+  const queue = new Map([[0, Array.from({ length: clients }, (_, id) => id)]]);
+  const random = Array.from({ length: clients }, (_, id) => randomStream(seed ^ Math.imul(id + 1, 0x85ebca6b)));
+  const failures = Array(clients).fill(0);
+  const frames = [];
+  let attempts = 0;
+  let peakRetries = 0;
+  let completed = 0;
+
+  for (let tick = 0; completed < clients; tick++) {
+    const due = queue.get(tick) || [];
+    queue.delete(tick);
+    const capacity = capacityAt(tick, incident);
+    // Client ID breaks ties when several arrivals compete for the same slot.
+    due.sort((a, b) => a - b);
+    const events = due.map((client, slot) => {
+      const retry = failures[client] > 0;
+      const ok = slot < capacity;
+      if (ok) {
+        completed++;
+      } else {
+        failures[client]++;
+        const next = tick + retryDelay(policy, failures[client], random[client]);
+        if (!queue.has(next)) queue.set(next, []);
+        queue.get(next).push(client);
+      }
+      return { client, ok, retry };
+    });
+    attempts += due.length;
+    if (tick > 0) peakRetries = Math.max(peakRetries, due.length);
+    frames.push({ tick, capacity, events, completed });
+  }
+  return { incident, clients, seed, policy, tickMs: TICK_MS, frames,
+    stats: { attempts, retries: attempts - clients, peakRetries, finishMs: (frames.length - 1) * TICK_MS } };
+}
+
+// A failed burst is a crackle. A successful burst plays a pitched sine note.
+// Summing by tick keeps the sound intelligible when dozens of clients collide.
+function renderAudio(trace, sampleRate = 22050) {
+  const step = Math.round(trace.tickMs * sampleRate / 1000);
+  const pcm = new Float32Array(trace.frames.length * step + Math.ceil(0.18 * sampleRate));
+  const notes = [220, 261.63, 329.63, 392, 440];
+  let noiseState = 1;
+  for (const frame of trace.frames) {
+    if (!frame.events.length) continue;
+    const successes = frame.events.filter(event => event.ok);
+    const hits = successes.length;
+    const misses = frame.events.length - hits;
+    const pitch = notes[(successes[0]?.client || 0) % notes.length];
+    const crackle = misses ? Math.min(0.54, 0.12 + 0.07 * Math.log2(misses + 1)) : 0;
+    const chime = hits ? Math.min(0.42, 0.17 + 0.07 * Math.log2(hits + 1)) : 0;
+    const start = frame.tick * step;
+    const length = Math.round((hits ? 0.16 : 0.07) * sampleRate);
+    for (let i = 0; i < length; i++) {
+      const t = i / sampleRate;
+      noiseState = (Math.imul(noiseState, 1664525) + 1013904223) >>> 0;
+      const noise = noiseState / 2147483648 - 1;
+      const attack = Math.min(1, t / 0.002);
+      pcm[start + i] += attack * (crackle * Math.exp(-65 * t) * noise
+        + chime * Math.exp(-28 * t) * Math.sin(2 * Math.PI * pitch * t));
+    }
+  }
+  return pcm;
+}
+
+
+const get = id => document.getElementById(id);
+const query = new URLSearchParams(location.hash.slice(1));
+const fromList = (name, list, fallback) => {
+  const value = query.get(name);
+  return list.includes(value) ? value : fallback;
+};
+get("incident").value = fromList("incident", Object.keys(INCIDENTS), DEFAULTS.incident);
+get("clients").value = fromList("clients", ["32", "64", "128"], "64");
+const seedParam = query.get("seed");
+get("seed").value = seedParam && /^\d+$/.test(seedParam) && Number(seedParam) <= 0xffffffff ? Number(seedParam) : DEFAULTS.seed;
+let policy = fromList("policy", Object.keys(POLICIES), "fixed");
+let traces = {};
+let trace;
+let position = 0;
+let started = null;
+let muted = false;
+let context;
+let source;
+let animation;
+let requestId = 0;
+let buffer;
+const canvas = get("raster");
+const plot = canvas.getContext("2d");
+const duration = () => trace.frames.length * trace.tickMs / 1000 + 0.18;
+
+function draw() {
+  const { width, height } = canvas.getBoundingClientRect();
+  if (!width || !height) return;
+  const scale = window.devicePixelRatio || 1;
+  const pixelWidth = Math.round(width * scale);
+  const pixelHeight = Math.round(height * scale);
+  if (canvas.width !== pixelWidth || canvas.height !== pixelHeight) {
+    canvas.width = pixelWidth;
+    canvas.height = pixelHeight;
+  }
+  plot.setTransform(scale, 0, 0, scale, 0, 0);
+  plot.clearRect(0, 0, width, height);
+  const left = 30, right = width - 9, top = 12, bottom = height - 24;
+  const x = time => left + time / duration() * (right - left);
+  const row = (bottom - top) / trace.clients;
+  plot.font = "10px monospace";
+  plot.fillStyle = "#acbaa4";
+  plot.textAlign = "right";
+  plot.fillText("C1", left - 5, top + 6);
+  plot.fillText("C" + trace.clients, left - 5, bottom);
+  plot.strokeStyle = "#34422f";
+  plot.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const y = top + i * (bottom - top) / 4;
+    plot.beginPath(); plot.moveTo(left, y); plot.lineTo(right, y); plot.stroke();
+  }
+  const targetInterval = duration() / (width < 420 ? 4 : 6);
+  const step = [0.25, 0.5, 1, 2, 5, 10, 20, 40].find(n => n >= targetInterval) || 50;
+  plot.textAlign = "center";
+  for (let sec = 0; sec < duration(); sec += step) {
+    plot.beginPath(); plot.moveTo(x(sec), top); plot.lineTo(x(sec), bottom); plot.stroke();
+    plot.fillText(String(sec), x(sec), height - 6);
+  }
+  for (const frame of trace.frames) {
+    const at = x(frame.tick * trace.tickMs / 1000);
+    for (const event of frame.events) {
+      plot.fillStyle = event.ok ? "#b8ea98" : "#ff956a";
+      plot.fillRect(at, top + event.client * row, Math.min(4, Math.max(1.5, x(0.07) - left)), Math.max(0.9, row * 0.78));
+    }
+  }
+  if (position > 0 || started !== null) {
+    plot.strokeStyle = "#f9f8db";
+    plot.beginPath(); plot.moveTo(x(position), top - 4); plot.lineTo(x(position), bottom + 3); plot.stroke();
+  }
+  get("elapsed").textContent = position.toFixed(1).padStart(4, "0") + " s";
+  get("scrub").value = String(position);
+  get("scrub").setAttribute("aria-valuetext", position.toFixed(1) + " seconds");
+}
+
+function stopAudio() {
+  if (!source) return;
+  source.stop();
+  source.disconnect();
+  source = null;
+}
+
+async function startAudio() {
+  const id = ++requestId;
+  if (muted || started === null) return;
+  try {
+    context ||= new (window.AudioContext || window.webkitAudioContext)();
+    await context.resume();
+    if (id !== requestId || muted || started === null) return;
+    if (!buffer) {
+      const samples = renderAudio(trace);
+      buffer = context.createBuffer(1, samples.length, 22050);
+      buffer.copyToChannel(samples, 0);
+    }
+    stopAudio();
+    const offset = (performance.now() - started) / 1000;
+    if (offset >= buffer.duration) return;
+    source = context.createBufferSource();
+    source.buffer = buffer;
+    source.connect(context.destination);
+    source.start(0, offset);
+  } catch {
+    muted = true;
+    get("sound").textContent = "Sound off";
+    get("sound").setAttribute("aria-pressed", "false");
+    get("status").textContent = "Audio is unavailable. Visual playback is active.";
+  }
+}
+
+function pause() {
+  if (started !== null) position = Math.min(duration(), (performance.now() - started) / 1000);
+  started = null;
+  requestId++;
+  stopAudio();
+  cancelAnimationFrame(animation);
+  get("play").textContent = position >= duration() ? "Replay" : "Play trace";
+  get("signal").textContent = position >= duration() ? "Trace complete" : position > 0 ? "Paused" : "Ready to play";
+  draw();
+}
+
+function animate() {
+  if (started === null) return;
+  position = Math.min(duration(), (performance.now() - started) / 1000);
+  if (position >= duration()) { pause(); return; }
+  draw();
+  animation = requestAnimationFrame(animate);
+}
+
+function play() {
+  if (position >= duration()) position = 0;
+  started = performance.now() - position * 1000;
+  get("play").textContent = "Pause";
+  get("signal").textContent = "Playing trace";
+  startAudio();
+  animate();
+}
+
+function replayHash() {
+  return new URLSearchParams({ incident: trace.incident, clients: String(trace.clients), seed: String(trace.seed), policy }).toString();
+}
+
+function selectPolicy(name) {
+  if (trace) pause();
+  policy = name;
+  trace = traces[policy];
+  position = 0;
+  buffer = null;
+  get("trace-title").textContent = POLICIES[name];
+  get("client-label").textContent = trace.clients + " clients";
+  get("scrub").max = duration();
+  for (const button of get("policies").children) button.setAttribute("aria-pressed", String(button.value === name));
+  for (const row of get("scores").children) row.classList.toggle("active", row.dataset.policy === name);
+  pause();
+}
+
+function rebuild() {
+  if (!get("seed").validity.valid || get("seed").value === "") {
+    get("seed").reportValidity();
+    get("seed").value = trace?.seed ?? DEFAULTS.seed;
+  }
+  const config = { clients: Number(get("clients").value), incident: get("incident").value, seed: Number(get("seed").value) };
+  get("description").textContent = INCIDENTS[config.incident].description;
+  get("scores").replaceChildren();
+  for (const [name, label] of Object.entries(POLICIES)) {
+    traces[name] = simulate({ ...config, policy: name });
+    const { stats } = traces[name];
+    const row = get("scores").insertRow();
+    row.dataset.policy = name;
+    for (const value of [label, stats.retries, stats.peakRetries, (stats.finishMs / 1000).toFixed(1) + " s"]) {
+      row.insertCell().textContent = value;
+    }
+  }
+  selectPolicy(policy);
+}
+
+for (const [name, label] of Object.entries(POLICIES)) {
+  const button = document.createElement("button");
+  button.type = "button"; button.value = name; button.textContent = label;
+  button.onclick = () => selectPolicy(name);
+  get("policies").append(button);
+}
+for (const id of ["incident", "seed", "clients"]) get(id).addEventListener("change", rebuild);
+get("play").onclick = () => started === null ? play() : pause();
+get("sound").onclick = () => {
+  muted = !muted;
+  get("sound").textContent = muted ? "Sound off" : "Sound on";
+  get("sound").setAttribute("aria-pressed", String(!muted));
+  if (muted) { requestId++; stopAudio(); } else startAudio();
+};
+get("scrub").oninput = event => {
+  const next = Number(event.target.value);
+  const resume = started !== null;
+  pause();
+  position = next;
+  if (resume && position < duration()) play(); else pause();
+};
+let copyTimer;
+get("copy").onclick = async () => {
+  const url = new URL(location.href);
+  url.hash = replayHash();
+  // Local files cannot produce portable share links. Use the hosted copy.
+  if (url.protocol === "file:") {
+    const hosted = new URL("https://raw.githack.com/rajatwasan/rajatwasan.github.io/retry-radio/experiments/retry-radio/index.html");
+    hosted.hash = url.hash;
+    url.href = hosted.href;
+  }
+  try {
+    await navigator.clipboard.writeText(url.href);
+    get("copy").textContent = "Link copied";
+    clearTimeout(copyTimer);
+    copyTimer = setTimeout(() => { get("copy").textContent = "Copy replay link"; }, 1800);
+  } catch {
+    window.prompt("Copy this replay link", url.href);
+  }
+};
+rebuild();
+new ResizeObserver(draw).observe(canvas);
+</script>
+</body></html>
