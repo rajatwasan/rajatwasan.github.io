@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#171b1a">
+<title>Retry Radio | Listen to a retry storm</title>
+<meta name="description" content="Hear how 64 clients recover from the same outage with fixed retries, exponential backoff and jitter. A deterministic systems experiment.">
+<style>/* STYLES */</style>
+</head>
+<body>
+<main>
+<header><span class="mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><span>Rajat Wasan <span class="sub">/ Systems experiments</span></span><a class="source" href="https://github.com/rajatwasan/rajatwasan.github.io/tree/retry-radio/experiments/retry-radio">Source code</a></header>
+<section class="intro"><div><h1>Retry Radio<span>.</span></h1><p>Hear what happens when clients retry together.</p></div><div class="air"><b></b><span id="signal">Ready to play</span></div></section>
+<div class="deck">
+<section class="monitor" aria-label="Retry trace">
+<div class="panel-head"><div><span class="indicator"></span> Request raster</div><span class="fine" id="client-label">64 clients</span></div>
+<div class="scope"><div class="scope-head"><h2 id="trace-title">Fixed interval</h2><span id="elapsed">00.0 s</span></div>
+<canvas id="raster" role="img" aria-label="Request trace. Each row is a client. Orange marks failed requests and green marks accepted requests."></canvas>
+<div class="legend"><span><i class="dot fail"></i>Rejected</span><span><i class="dot ok"></i>Accepted</span><span class="axis">Time in seconds</span></div></div>
+<div class="transport"><button type="button" id="play" class="play">Play trace</button><label class="sr" for="scrub">Playback position</label><input id="scrub" type="range" min="0" max="100" step="0.1" value="0"><button type="button" id="sound" class="audio" aria-pressed="true">Sound on</button></div>
+</section>
+<aside class="controls" aria-label="Experiment controls">
+<div class="panel-head">Experiment controls</div>
+<label for="incident">Incident</label><select id="incident"><option value="restart">Cold restart</option><option value="brownout">Brownout</option><option value="rolling">Rolling recovery</option></select>
+<p id="description"></p>
+<div class="fields"><div><label for="clients">Clients</label><select id="clients"><option>32</option><option selected>64</option><option>128</option></select></div><div><label for="seed">Replay seed</label><input id="seed" type="number" min="0" max="4294967295" step="1" value="42"></div></div>
+<label id="policy-label">Retry policy</label><div id="policies" class="policies" role="group" aria-labelledby="policy-label"></div>
+</aside></div>
+<section class="results"><div class="result-head"><h2>Same outage, three outcomes.</h2><button id="copy" type="button">Copy replay link</button></div><p class="hint">Peak counts retries in a 100 ms window. The shared first wave is excluded.</p>
+<div class="table-wrap"><table><thead><tr><th>Policy</th><th>Total retries</th><th>Peak retries</th><th>Last success</th></tr></thead><tbody id="scores"></tbody></table></div>
+</section>
+<footer><span>Click a policy to compare. Crackles are rejections. Tones are successes.</span><span>100 ms / tick</span></footer>
+<p id="status" class="sr" role="status"></p>
+</main><script>/* ENGINE + AUDIO + APP */</script>
+</body></html>
